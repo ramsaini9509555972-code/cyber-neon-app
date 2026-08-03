@@ -22,6 +22,7 @@ jobs:
             sed -i 's/#requirements = python3,kivy/requirements = python3,kivy,pygame,speech_recognition/g' buildozer.spec
             sed -i 's/#android.permissions = INTERNET/android.permissions = INTERNET,RECORD_AUDIO/g' buildozer.spec
             sed -i 's/#android.accept_sdk_license = False/android.accept_sdk_license = True/g' buildozer.spec
+            sed -i 's/android.accept_sdk_license = False/android.accept_sdk_license = True/g' buildozer.spec
             buildozer -v android debug
 
       - name: Upload APK Artifact
