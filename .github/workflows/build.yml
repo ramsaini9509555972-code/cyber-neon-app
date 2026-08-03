@@ -33,12 +33,15 @@ jobs:
     - name: Build APK with Buildozer
       run: |
         buildozer init
-        # Accept Android SDK Licenses automatically
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+        # Set requirements and permissions
         sed -i 's/requirements = python3,kivy/requirements = python3,kivy,gTTS,pygame,speech_recognition/g' buildozer.spec
         sed -i 's/# android.permissions = INTERNET/android.permissions = INTERNET,RECORD_AUDIO/g' buildozer.spec
-        buildozer -v android debug
-
+        # Automatically accept all SDK licenses during build
+        sed -i 's/# android.accept_sdk_license = False/android.accept_sdk_license = True/g' buildozer.spec
+        
+        # Accept licenses via yes pipe
+        yes | buildozer -v android debug
+        
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
