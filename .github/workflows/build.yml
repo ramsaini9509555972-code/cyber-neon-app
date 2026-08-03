@@ -61,7 +61,7 @@ jobs:
 
     - name: Install Python For Android & Cython
       run: |
-        pip install --upgrade pip setuptools wheel
+        python -m pip install --upgrade pip setuptools wheel
         pip install cython==0.29.33
         pip install --upgrade python-for-android
 
