@@ -19,6 +19,9 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -56,7 +59,7 @@ jobs:
         pip install --upgrade pip setuptools wheel
         pip install cython==0.29.33 buildozer
 
-    - name: Initialize and Configure Buildozer
+    - name: Initialize and Configure Buildozer Spec
       run: |
         buildozer init
         sed -i 's/#requirements = python3,kivy/requirements = python3,kivy,pygame,speech_recognition/g' buildozer.spec
@@ -67,12 +70,6 @@ jobs:
         sed -i 's/android.api = .*$/android.api = 33/g' buildozer.spec
         sed -i 's/#android.minapi = .*$/android.minapi = 21/g' buildozer.spec
         sed -i 's/android.minapi = .*$/android.minapi = 21/g' buildozer.spec
-
-    - name: Pre-accept Android SDK Licenses
-      run: |
-        mkdir -p $HOME/.buildozer/android/platform/android-sdk/licenses
-        echo "24333f1a9bef6e60b13224b74bb2629b0ef4610c" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-        echo "84831b9409646a918e30573bab4c9c91346d8abd" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
 
     - name: Build APK with Buildozer
       run: |
