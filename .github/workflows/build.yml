@@ -27,21 +27,26 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential libffi-dev libssl-dev ffmpeg autoconf automake libtool pkg-config zlib1g-dev libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good
-        pip install --upgrade pip setuptools Cython==0.29.33 buildozer
+        sudo apt-get install -y build-essential libffi-dev libssl-dev ffmpeg autoconf automake libtool pkg-config zlib1g-dev libgstreamer1.0-dev gstreamer1.0-plugins-good
+        pip install --upgrade pip setuptools cython==0.29.33 buildozer
 
     - name: Build APK with Buildozer
       run: |
         buildozer init
         # Set requirements and permissions
-        sed -i 's/requirements = python3,kivy/requirements = python3,kivy,gTTS,pygame,speech_recognition/g' buildozer.spec
-        sed -i 's/# android.permissions = INTERNET/android.permissions = INTERNET,RECORD_AUDIO/g' buildozer.spec
+        sed -i 's/#requirements = python3,kivy/requirements = python3,kivy,pygame,speech_recognition/g' buildozer.spec
+        sed -i 's/#android.permissions = INTERNET/android.permissions = INTERNET,RECORD_AUDIO/g' buildozer.spec
         # Automatically accept all SDK licenses during build
-        sed -i 's/# android.accept_sdk_license = False/android.accept_sdk_license = True/g' buildozer.spec
+        sed -i 's/#android.accept_sdk_license = False/android.accept_sdk_license = True/g' buildozer.spec
         
-        # Accept licenses via yes pipe
-        yes | buildozer -v android debug
+        # Accept SDK licenses properly before building
+        mkdir -p ~/.android
+        touch ~/.android/repositories.cfg
+        yes | sdkmanager --licenses || true
         
+        # Build APK
+        buildozer -v android debug
+
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
