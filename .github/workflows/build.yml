@@ -52,14 +52,26 @@ jobs:
           libltdl-dev \
           libffi-dev \
           libssl-dev \
-          clang \
           patch
+        # (Host 'clang' package is intentionally omitted to prevent NDK include path conflicts)
 
     - name: Install Buildozer and Cython
       run: |
         pip install --upgrade pip setuptools wheel
         pip install cython==0.29.33
         pip install buildozer
+
+    - name: Ensure NDK clang is used & Clean previous builds
+      run: |
+        # Buildozer by default uses recent NDK versions (like r28c)
+        ANDROIDNDK="$HOME/.buildozer/android/platform/android-ndk-r28c"
+        
+        # Force python-for-android/buildozer to use the NDK toolchain clang wrappers
+        echo "CC=$ANDROIDNDK/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" >> $GITHUB_ENV
+        echo "CXX=$ANDROIDNDK/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++" >> $GITHUB_ENV
+        
+        # Clean cached build artifacts to avoid stale mixed headers
+        rm -rf .buildozer android/.buildozer .p4a .gradle
 
     - name: Generate Buildozer Spec
       run: |
