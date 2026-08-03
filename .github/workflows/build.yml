@@ -52,6 +52,7 @@ jobs:
           unzip \
           zip \
           autoconf \
+          automake \
           libtool \
           pkg-config \
           libstdc++6 \
