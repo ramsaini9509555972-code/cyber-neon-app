@@ -48,7 +48,6 @@ jobs:
           autoconf \
           libtool \
           pkg-config \
-          libncurses5 \
           libstdc++6 \
           libz1
 
