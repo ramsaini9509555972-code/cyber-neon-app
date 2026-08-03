@@ -68,6 +68,12 @@ jobs:
         sed -i 's/#android.minapi = .*$/android.minapi = 21/g' buildozer.spec
         sed -i 's/android.minapi = .*$/android.minapi = 21/g' buildozer.spec
 
+    - name: Pre-accept Android SDK Licenses
+      run: |
+        mkdir -p $HOME/.buildozer/android/platform/android-sdk/licenses
+        echo "24333f1a9bef6e60b13224b74bb2629b0ef4610c" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+        echo "84831b9409646a918e30573bab4c9c91346d8abd" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
+
     - name: Build APK with Buildozer
       run: |
         buildozer -v android debug
