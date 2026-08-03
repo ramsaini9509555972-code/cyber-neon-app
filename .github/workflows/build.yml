@@ -70,6 +70,10 @@ jobs:
         sed -i 's/android.api = .*$/android.api = 33/g' buildozer.spec
         sed -i 's/#android.minapi = .*$/android.minapi = 21/g' buildozer.spec
         sed -i 's/android.minapi = .*$/android.minapi = 21/g' buildozer.spec
+        
+        # Point buildozer directly to GitHub Actions pre-installed SDK/NDK to avoid downloading & license blocks
+        echo "android.sdk_path = $ANDROID_HOME" >> buildozer.spec
+        echo "android.ndk_path = /usr/local/lib/android/sdk/ndk/27.0.12077973" >> buildozer.spec
 
     - name: Build APK with Buildozer
       run: |
