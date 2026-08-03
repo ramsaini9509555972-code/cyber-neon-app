@@ -53,7 +53,6 @@ jobs:
           libffi-dev \
           libssl-dev \
           patch
-        # (Host 'clang' package is intentionally omitted to prevent NDK include path conflicts)
 
     - name: Install Buildozer and Cython
       run: |
@@ -63,13 +62,26 @@ jobs:
 
     - name: Ensure NDK clang is used & Clean previous builds
       run: |
-        # Buildozer by default uses recent NDK versions (like r28c)
+        # Location buildozer installs the NDK to
         ANDROIDNDK="$HOME/.buildozer/android/platform/android-ndk-r28c"
-        
-        # Force python-for-android/buildozer to use the NDK toolchain clang wrappers
+
+        # Persist NDK path so buildozer/python-for-android sees it
+        echo "ANDROIDNDK=$ANDROIDNDK" >> $GITHUB_ENV
+        echo "ANDROID_NDK_HOME=$ANDROIDNDK" >> $GITHUB_ENV
+
+        # Use NDK clang wrappers as default compiler for all steps
         echo "CC=$ANDROIDNDK/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" >> $GITHUB_ENV
         echo "CXX=$ANDROIDNDK/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++" >> $GITHUB_ENV
-        
+
+        # Prepend NDK clang bin to PATH so toolchain binaries are found first
+        echo "PATH=$ANDROIDNDK/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH" >> $GITHUB_ENV
+
+        # Force the compiler to use the NDK sysroot (prevents falling back to host /usr/include)
+        SYSROOT="$ANDROIDNDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
+        echo "CFLAGS=--sysroot=$SYSROOT -isystem $SYSROOT/usr/include" >> $GITHUB_ENV
+        echo "CXXFLAGS=--sysroot=$SYSROOT -isystem $SYSROOT/usr/include" >> $GITHUB_ENV
+        echo "LDFLAGS=--sysroot=$SYSROOT" >> $GITHUB_ENV
+
         # Clean cached build artifacts to avoid stale mixed headers
         rm -rf .buildozer android/.buildozer .p4a .gradle
 
