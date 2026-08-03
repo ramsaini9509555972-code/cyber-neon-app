@@ -19,6 +19,12 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v2
+      with:
+        items: android-33,build-tools-33.0.2,platforms-33
+        accept-android-sdk-licenses: true
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -61,7 +67,9 @@ jobs:
 
     - name: Generate Buildozer Spec
       run: |
-        yes | buildozer init
+        if [ ! -f "buildozer.spec" ]; then
+          yes | buildozer init
+        fi
 
     - name: Build APK with Buildozer
       run: |
