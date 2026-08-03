@@ -39,6 +39,11 @@ jobs:
         # Automatically accept all SDK licenses during build
         sed -i 's/#android.accept_sdk_license = False/android.accept_sdk_license = True/g' buildozer.spec
         
+        # Set Android SDK and NDK paths explicitly for Buildozer
+        export ANDROIDSDK=$HOME/.buildozer/android/platform/android-sdk
+        export ANDROIDNDK=$HOME/.buildozer/android/platform/android-ndk-r25b
+        export PATH=$PATH:$ANDROIDSDK/cmdline-tools/latest/bin:$ANDROIDSDK/platform-tools
+        
         # Accept SDK licenses properly before building
         mkdir -p ~/.android
         touch ~/.android/repositories.cfg
