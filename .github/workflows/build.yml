@@ -80,6 +80,20 @@ jobs:
 
     - name: Build APK with Buildozer
       run: |
+        # Force configure caches for cross-compilation (avoid compile-and-run tests)
+        export ac_cv_sizeof_off_t=8
+        export ac_cv_func_localtime_s=no
+        export ac_cv_func_localtime_r=yes
+        
+        # Pretend deflate and zlib are available so checks succeed
+        export ac_cv_func_deflate=yes
+        export ac_cv_lib_z=z
+        
+        # Ensure 64-bit file offsets and link with math/zlib for configure/linker tests
+        export CFLAGS="-D_FILE_OFFSET_BITS=64"
+        export LDFLAGS="-lm -lz"
+        
+        # Run buildozer
         yes | buildozer -v android debug
 
     - name: Dump any config.log files for debugging
