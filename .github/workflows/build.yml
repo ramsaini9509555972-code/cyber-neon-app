@@ -19,9 +19,6 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v3
-
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -39,8 +36,14 @@ jobs:
         # Set requirements and permissions
         sed -i 's/#requirements = python3,kivy/requirements = python3,kivy,pygame,speech_recognition/g' buildozer.spec
         sed -i 's/#android.permissions = INTERNET/android.permissions = INTERNET,RECORD_AUDIO/g' buildozer.spec
-        # Automatically accept all SDK licenses during build
+        
+        # Automatically accept SDK licenses and set paths inside buildozer.spec
         sed -i 's/#android.accept_sdk_license = False/android.accept_sdk_license = True/g' buildozer.spec
+        sed -i 's/#android.api = .*$/android.api = 33/g' buildozer.spec
+        sed -i 's/#android.minapi = .*$/android.minapi = 21/g' buildozer.spec
+
+        # Pre-create Android SDK directories so buildozer doesn't fail looking for aapt
+        mkdir -p $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest
         
         # Build APK
         buildozer -v android debug
