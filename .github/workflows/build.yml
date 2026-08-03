@@ -65,8 +65,10 @@ jobs:
 
     - name: Build APK using PFA Directly
       env:
+        ANDROID_HOME: ${{ env.ANDROID_HOME }}
+        ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/25.2.9519653
         ANDROIDSDK: ${{ env.ANDROID_HOME }}
-        ANDROIDNDK: /usr/local/lib/android/sdk/ndk/27.0.12077973
+        ANDROIDNDK: ${{ env.ANDROID_HOME }}/ndk/25.2.9519653
         ANDROIDAPI: "34"
         ANDROIDSIGN: "debug"
       run: |
@@ -76,8 +78,7 @@ jobs:
           --version=0.1 \
           --bootstrap=sdl2 \
           --target=apk \
-          --arch=arm64-v8a \
-          --ciebug
+          --arch=arm64-v8a
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
