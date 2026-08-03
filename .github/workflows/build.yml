@@ -54,33 +54,30 @@ jobs:
           libstdc++6 \
           libz1
 
-    - name: Install Buildozer and Cython
+    - name: Install Python For Android & Cython
       run: |
         pip install --upgrade pip setuptools wheel
-        pip install cython==0.29.33 buildozer
+        pip install cython==0.29.33
+        pip install python-for-android
 
-    - name: Initialize and Configure Buildozer Spec
+    - name: Build APK using PFA Directly
+      env:
+        ANDROIDSDK: ${{ env.ANDROID_HOME }}
+        ANDROIDNDK: /usr/local/lib/android/sdk/ndk/27.0.12077973
+        ANDROIDAPI: "33"
+        ANDROIDSIGN: "debug"
       run: |
-        buildozer init
-        sed -i 's/#requirements = python3,kivy/requirements = python3,kivy,pygame,speech_recognition/g' buildozer.spec
-        sed -i 's/#android.permissions = INTERNET/android.permissions = INTERNET,RECORD_AUDIO/g' buildozer.spec
-        sed -i 's/#android.accept_sdk_license = False/android.accept_sdk_license = True/g' buildozer.spec
-        sed -i 's/android.accept_sdk_license = False/android.accept_sdk_license = True/g' buildozer.spec
-        sed -i 's/#android.api = .*$/android.api = 33/g' buildozer.spec
-        sed -i 's/android.api = .*$/android.api = 33/g' buildozer.spec
-        sed -i 's/#android.minapi = .*$/android.minapi = 21/g' buildozer.spec
-        sed -i 's/android.minapi = .*$/android.minapi = 21/g' buildozer.spec
-        
-        # Point buildozer directly to GitHub Actions pre-installed SDK/NDK to avoid downloading & license blocks
-        echo "android.sdk_path = $ANDROID_HOME" >> buildozer.spec
-        echo "android.ndk_path = /usr/local/lib/android/sdk/ndk/27.0.12077973" >> buildozer.spec
-
-    - name: Build APK with Buildozer
-      run: |
-        buildozer -v android debug
+        p4a create --requirements=python3,kivy,pygame,speech_recognition \
+          --package=org.cyberneon.app \
+          --name="Cyber Neon" \
+          --version=0.1 \
+          --bootstrap=sdl2 \
+          --target=apk \
+          --arch=arm64-v8a \
+          --ciebug
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: CyberNeon-APK
-        path: bin/*.apk
+        path: "*.apk"
