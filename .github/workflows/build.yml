@@ -51,13 +51,24 @@ jobs:
           pkg-config \
           libltdl-dev \
           libffi-dev \
-          libssl-dev
+          libssl-dev \
+          clang
 
     - name: Install Buildozer and Cython
       run: |
         pip install --upgrade pip setuptools wheel
         pip install cython==0.29.33
         pip install buildozer
+
+    - name: Install Android NDK r21e and export environment
+      run: |
+        mkdir -p ~/.buildozer/android/platform
+        wget -q https://dl.google.com/android/repository/android-ndk-r21e-linux-x86_64.zip -O /tmp/android-ndk-r21e.zip
+        unzip -q /tmp/android-ndk-r21e.zip -d ~/.buildozer/android/platform
+        echo "ANDROIDNDK=$HOME/.buildozer/android/platform/android-ndk-r21e" >> $GITHUB_ENV
+        echo "ANDROIDNDK_HOME=$HOME/.buildozer/android/platform/android-ndk-r21e" >> $GITHUB_ENV
+        echo "ANDROIDAPI=33" >> $GITHUB_ENV
+        echo "ANDROIDMINAPI=24" >> $GITHUB_ENV
 
     - name: Generate Buildozer Spec
       run: |
@@ -67,8 +78,7 @@ jobs:
 
     - name: Build APK with Buildozer
       run: |
-        mkdir -p ~/.buildozer
-        yes | buildozer -v android debug
+        buildozer -v android debug
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
