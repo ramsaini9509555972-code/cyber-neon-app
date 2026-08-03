@@ -39,12 +39,12 @@ jobs:
         
         # Automatically accept SDK licenses and set paths inside buildozer.spec
         sed -i 's/#android.accept_sdk_license = False/android.accept_sdk_license = True/g' buildozer.spec
+        sed -i 's/android.accept_sdk_license = False/android.accept_sdk_license = True/g' buildozer.spec
         sed -i 's/#android.api = .*$/android.api = 33/g' buildozer.spec
+        sed -i 's/android.api = .*$/android.api = 33/g' buildozer.spec
         sed -i 's/#android.minapi = .*$/android.minapi = 21/g' buildozer.spec
+        sed -i 's/android.minapi = .*$/android.minapi = 21/g' buildozer.spec
 
-        # Pre-create Android SDK directories so buildozer doesn't fail looking for aapt
-        mkdir -p $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest
-        
         # Build APK
         buildozer -v android debug
 
