@@ -22,8 +22,8 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
       with:
-        platforms: android-34
-        build-tools: 34.0.0
+        platforms: android-33
+        build-tools: 33.0.2
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -55,6 +55,7 @@ jobs:
           automake \
           libtool \
           pkg-config \
+          libltdl-dev \
           libstdc++6 \
           libz1
 
@@ -67,7 +68,7 @@ jobs:
     - name: Build APK using PFA Directly
       env:
         ANDROIDSDK: ${{ env.ANDROID_HOME }}
-        ANDROIDAPI: "34"
+        ANDROIDAPI: "33"
         ANDROIDSIGN: "debug"
       run: |
         p4a create --requirements=python3,kivy,pygame,speech_recognition \
