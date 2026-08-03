@@ -60,7 +60,7 @@ jobs:
         pip install cython==0.29.33
         pip install buildozer
 
-    - name: Ensure NDK clang is used & Clean previous builds
+    - name: Ensure NDK path is set & Clean previous builds
       run: |
         # Location buildozer installs the NDK to
         ANDROIDNDK="$HOME/.buildozer/android/platform/android-ndk-r28c"
@@ -68,19 +68,6 @@ jobs:
         # Persist NDK path so buildozer/python-for-android sees it
         echo "ANDROIDNDK=$ANDROIDNDK" >> $GITHUB_ENV
         echo "ANDROID_NDK_HOME=$ANDROIDNDK" >> $GITHUB_ENV
-
-        # Use NDK clang wrappers as default compiler for all steps
-        echo "CC=$ANDROIDNDK/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" >> $GITHUB_ENV
-        echo "CXX=$ANDROIDNDK/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++" >> $GITHUB_ENV
-
-        # Prepend NDK clang bin to PATH so toolchain binaries are found first
-        echo "PATH=$ANDROIDNDK/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH" >> $GITHUB_ENV
-
-        # Force the compiler to use the NDK sysroot (prevents falling back to host /usr/include)
-        SYSROOT="$ANDROIDNDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
-        echo "CFLAGS=--sysroot=$SYSROOT -isystem $SYSROOT/usr/include" >> $GITHUB_ENV
-        echo "CXXFLAGS=--sysroot=$SYSROOT -isystem $SYSROOT/usr/include" >> $GITHUB_ENV
-        echo "LDFLAGS=--sysroot=$SYSROOT" >> $GITHUB_ENV
 
         # Clean cached build artifacts to avoid stale mixed headers
         rm -rf .buildozer android/.buildozer .p4a .gradle
@@ -94,6 +81,11 @@ jobs:
     - name: Build APK with Buildozer
       run: |
         yes | buildozer -v android debug
+
+    - name: Dump any config.log files for debugging
+      if: failure()
+      run: |
+        find . -type f -name config.log -print -exec echo "=== {} ===" \; -exec sed -n '1,200p' {} \;
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
