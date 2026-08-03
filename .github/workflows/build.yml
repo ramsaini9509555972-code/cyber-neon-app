@@ -59,6 +59,10 @@ jobs:
         pip install cython==0.29.33
         pip install buildozer
 
+    - name: Generate Buildozer Spec
+      run: |
+        yes | buildozer init
+
     - name: Build APK with Buildozer
       run: |
         buildozer -v android debug
